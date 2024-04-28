@@ -1,0 +1,38 @@
+<!--
+// v0 by Vercel.
+// https://v0.dev/t/RYAWqvS6VMr
+-->
+
+<div class="w-full p-6 rounded-lg border border-gray-200 grid gap-4">
+  <h1 class="text-3xl font-bold">Deoxyribonucleic Acid Data Storage</h1>
+  <div class="grid gap-1">
+    <label
+      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      for="digital-data"
+    >
+      Digital Data
+    </label>
+    <textarea
+      class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      id="digital-data"
+      placeholder="Data"
+    ></textarea>
+  </div>
+  <button class="inline-flex items-center justify-center whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-11 rounded-md px-8">
+    Convert
+  </button>
+  <div class="grid gap-1">
+    <label
+      class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+      for="sequence"
+    >
+      DNA Sequence
+    </label>
+    <textarea
+      class="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+      id="sequence"
+      placeholder="DNA Sequence"
+      readonly=""
+    ></textarea>
+  </div>
+</div>

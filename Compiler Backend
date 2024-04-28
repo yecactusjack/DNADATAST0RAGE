@@ -1,4 +1,4 @@
-import lzma  # Python's lzma module provides LZMA compression
+import lzma
 
 def text_to_binary(text):
     """
@@ -23,24 +23,24 @@ def binary_to_dna(binary_data):
     Returns:
         str: The corresponding DNA sequence.
     """
-    # Define the mapping from 3-bit binary to DNA codons
+    # Define the mapping from 6-bit binary to DNA codons
     binary_to_codon = {
-        '000': 'AAA', '001': 'AAC', '010': 'AAG', '011': 'AAT',
-        '100': 'ACA', '101': 'ACC', '110': 'ACG', '111': 'ACT',
-        '000': 'AGA', '001': 'AGC', '010': 'AGG', '011': 'AGT',
-        '100': 'ATA', '101': 'ATC', '110': 'ATG', '111': 'ATT',
-        '000': 'CAA', '001': 'CAC', '010': 'CAG', '011': 'CAT',
-        '100': 'CCA', '101': 'CCC', '110': 'CCG', '111': 'CCT',
-        '000': 'CGA', '001': 'CGC', '010': 'CGG', '011': 'CGT',
-        '100': 'CTA', '101': 'CTC', '110': 'CTG', '111': 'CTT',
-        '000': 'GAA', '001': 'GAC', '010': 'GAG', '011': 'GAT',
-        '100': 'GCA', '101': 'GCC', '110': 'GCG', '111': 'GCT',
-        '000': 'GGA', '001': 'GGC', '010': 'GGG', '011': 'GGT',
-        '100': 'GTA', '101': 'GTC', '110': 'GTG', '111': 'GTT',
-        '000': 'TAA', '001': 'TAC', '010': 'TAG', '011': 'TAT',
-        '100': 'TCA', '101': 'TCC', '110': 'TCG', '111': 'TCT',
-        '000': 'TGA', '001': 'TGC', '010': 'TGG', '011': 'TGT',
-        '100': 'TTA', '101': 'TTC', '110': 'TTG', '111': 'TTT',
+        '000000': 'AAA', '000001': 'AAC', '000010': 'AAG', '000011': 'AAT',
+        '000100': 'ACA', '000101': 'ACC', '000110': 'ACG', '000111': 'ACT',
+        '001000': 'AGA', '001001': 'AGC', '001010': 'AGG', '001011': 'AGT',
+        '001100': 'ATA', '001101': 'ATC', '001110': 'ATG', '001111': 'ATT',
+        '010000': 'CAA', '010001': 'CAC', '010010': 'CAG', '010011': 'CAT',
+        '010100': 'CCA', '010101': 'CCC', '010110': 'CCG', '010111': 'CCT',
+        '011000': 'CGA', '011001': 'CGC', '011010': 'CGG', '011011': 'CGT',
+        '011100': 'CTA', '011101': 'CTC', '011110': 'CTG', '011111': 'CTT',
+        '100000': 'GAA', '100001': 'GAC', '100010': 'GAG', '100011': 'GAT',
+        '100100': 'GCA', '100101': 'GCC', '100110': 'GCG', '100111': 'GCT',
+        '101000': 'GGA', '101001': 'GGC', '101010': 'GGG', '101011': 'GGT',
+        '101100': 'GTA', '101101': 'GTC', '101110': 'GTG', '101111': 'GTT',
+        '110000': 'TAA', '110001': 'TAC', '110010': 'TAG', '110011': 'TAT',
+        '110100': 'TCA', '110101': 'TCC', '110110': 'TCG', '110111': 'TCT',
+        '111000': 'TGA', '111001': 'TGC', '111010': 'TGG', '111011': 'TGT',
+        '111100': 'TTA', '111101': 'TTC', '111110': 'TTG', '111111': 'TTT',
     }
 
     # Compress the binary data using LZMA
@@ -48,9 +48,9 @@ def binary_to_dna(binary_data):
 
     # Convert the compressed binary data to DNA
     compressed_binary_string = ''.join(f"{byte:08b}" for byte in compressed_binary)
-    binary_groups = [compressed_binary_string[i:i+3] for i in range(0, len(compressed_binary_string), 3)]
-    if len(binary_groups[-1]) < 3:
-        binary_groups[-1] = binary_groups[-1].ljust(3, '0')
+    binary_groups = [compressed_binary_string[i:i+6] for i in range(0, len(compressed_binary_string), 6)]
+    if len(binary_groups[-1]) < 6:
+        binary_groups[-1] = binary_groups[-1].ljust(6, '0')
 
     dna_sequence = ''.join(binary_to_codon[group] for group in binary_groups)
 
@@ -66,24 +66,24 @@ def dna_to_binary(dna_sequence):
     Returns:
         str: The corresponding binary data.
     """
-    # Define the mapping from DNA codons to 3-bit binary
+    # Define the mapping from DNA codons to 6-bit binary
     dna_to_binary = {
-        'AAA': '000', 'AAC': '001', 'AAG': '010', 'AAT': '011',
-        'ACA': '100', 'ACC': '101', 'ACG': '110', 'ACT': '111',
-        'AGA': '000', 'AGC': '001', 'AGG': '010', 'AGT': '011',
-        'ATA': '100', 'ATC': '101', 'ATG': '110', 'ATT': '111',
-        'CAA': '000', 'CAC': '001', 'CAG': '010', 'CAT': '011',
-        'CCA': '100', 'CCC': '101', 'CCG': '110', 'CCT': '111',
-        'CGA': '000', 'CGC': '001', 'CGG': '010', 'CGT': '011',
-        'CTA': '100', 'CTC': '101', 'CTG': '110', 'CTT': '111',
-        'GAA': '000', 'GAC': '001', 'GAG': '010', 'GAT': '011',
-        'GCA': '100', 'GCC': '101', 'GCG': '110', 'GCT': '111',
-        'GGA': '000', 'GGC': '001', 'GGG': '010', 'GGT': '011',
-        'GTA': '100', 'GTC': '101', 'GTG': '110', 'GTT': '111',
-        'TAA': '000', 'TAC': '001', 'TAG': '010', 'TAT': '011',
-        'TCA': '100', 'TCC': '101', 'TCG': '110', 'TCT': '111',
-        'TGA': '000', 'TGC': '001', 'TGG': '010', 'TGT': '011',
-        'TTA': '100', 'TTC': '101', 'TTG': '110', 'TTT': '111',
+        'AAA': '000000', 'AAC': '000001', 'AAG': '000010', 'AAT': '000011',
+        'ACA': '000100', 'ACC': '000101', 'ACG': '000110', 'ACT': '000111',
+        'AGA': '001000', 'AGC': '001001', 'AGG': '001010', 'AGT': '001011',
+        'ATA': '001100', 'ATC': '001101', 'ATG': '001110', 'ATT': '001111',
+        'CAA': '010000', 'CAC': '010001', 'CAG': '010010', 'CAT': '010011',
+        'CCA': '010100', 'CCC': '010101', 'CCG': '010110', 'CCT': '010111',
+        'CGA': '011000', 'CGC': '011001', 'CGG': '011010', 'CGT': '011011',
+        'CTA': '011100', 'CTC': '011101', 'CTG': '011110', 'CTT': '011111',
+        'GAA': '100000', 'GAC': '100001', 'GAG': '100010', 'GAT': '100011',
+        'GCA': '100100', 'GCC': '100101', 'GCG': '100110', 'GCT': '100111',
+        'GGA': '101000', 'GGC': '101001', 'GGG': '101010', 'GGT': '101011',
+        'GTA': '101100', 'GTC': '101101', 'GTG': '101110', 'GTT': '101111',
+        'TAA': '110000', 'TAC': '110001', 'TAG': '110010', 'TAT': '110011',
+        'TCA': '110100', 'TCC': '110101', 'TCG': '110110', 'TCT': '110111',
+        'TGA': '111000', 'TGC': '111001', 'TGG': '111010', 'TGT': '111011',
+        'TTA': '111100', 'TTC': '111101', 'TTG': '111110', 'TTT': '111111',
     }
 
     # Convert the DNA sequence to binary
@@ -96,7 +96,7 @@ def dna_to_binary(dna_sequence):
     return decompressed_binary.decode()
 
 # Example usage
-input_text = "imaad"
+input_text = "shazam"
 binary_data = text_to_binary(input_text)
 print("Text input:", input_text)
 print("Binary data:", binary_data)

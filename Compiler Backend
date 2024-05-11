@@ -1,4 +1,11 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 import lzma
+
+app = Flask(__name__)
+CORS(app) 
+
 
 def text_to_binary(text):
     """
@@ -25,7 +32,7 @@ def binary_to_dna(binary_data):
     """
     # Define the mapping from 6-bit binary to DNA codons
     binary_to_codon = {
-        '000000': 'AAA', '000001': 'AAC', '000010': 'AAG', '000011': 'AAT',
+        '000000': 'AAA', '000001': 'AAC', '000010': 'AAG', '000011': 'AAT', 
         '000100': 'ACA', '000101': 'ACC', '000110': 'ACG', '000111': 'ACT',
         '001000': 'AGA', '001001': 'AGC', '001010': 'AGG', '001011': 'AGT',
         '001100': 'ATA', '001101': 'ATC', '001110': 'ATG', '001111': 'ATT',
@@ -44,10 +51,12 @@ def binary_to_dna(binary_data):
     }
 
     # Compress the binary data using LZMA
-    compressed_binary = lzma.compress(binary_data.encode(), format=lzma.FORMAT_ALONE)
+    compressed_binary = lzma.compress(binary_data.encode())
 
     # Convert the compressed binary data to DNA
     compressed_binary_string = ''.join(f"{byte:08b}" for byte in compressed_binary)
+
+
     binary_groups = [compressed_binary_string[i:i+6] for i in range(0, len(compressed_binary_string), 6)]
     if len(binary_groups[-1]) < 6:
         binary_groups[-1] = binary_groups[-1].ljust(6, '0')
@@ -67,7 +76,7 @@ def dna_to_binary(dna_sequence):
         str: The corresponding binary data.
     """
     # Define the mapping from DNA codons to 6-bit binary
-    dna_to_binary = {
+    codon_to_binary = {
         'AAA': '000000', 'AAC': '000001', 'AAG': '000010', 'AAT': '000011',
         'ACA': '000100', 'ACC': '000101', 'ACG': '000110', 'ACT': '000111',
         'AGA': '001000', 'AGC': '001001', 'AGG': '001010', 'AGT': '001011',
@@ -86,22 +95,46 @@ def dna_to_binary(dna_sequence):
         'TTA': '111100', 'TTC': '111101', 'TTG': '111110', 'TTT': '111111',
     }
 
-    # Convert the DNA sequence to binary
-    binary_groups = [dna_sequence[i:i+3] for i in range(0, len(dna_sequence), 3)]
-    binary_data = ''.join(dna_to_binary[group] for group in binary_groups)
-
+    compressed_binary_string = ''
+    for codon in [dna_sequence[i:i+3] for i in range(0, len(dna_sequence), 3)]:
+        compressed_binary_string += codon_to_binary[codon]
+    
+    # Pad with zeros if necessary
+    remainder = len(compressed_binary_string) % 8
+    if remainder != 0:
+        compressed_binary_string = compressed_binary_string[:-remainder]
+    
+    # Convert binary string to bytes
+    compressed_binary = bytes([int(compressed_binary_string[i:i+8], 2) for i in range(0, len(compressed_binary_string), 8)])
+    
     # Decompress the binary data using LZMA
-    decompressed_binary = lzma.decompress(binary_data.encode())
+    decompressed_binary = lzma.decompress(compressed_binary)
+    
+    # Convert decompressed binary data to string
+    original_binary_data = decompressed_binary.decode()
+    
+    return original_binary_data
 
-    return decompressed_binary.decode()
+# # Example usage
+# input_text = "ATGCGTACGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGATCGA"
+# binary_data = text_to_binary(input_text)
+# print("Text input:", input_text)
+# print("Binary data:", binary_data)
+# dna_sequence = binary_to_dna(binary_data)
+# print("DNA sequence:", dna_sequence)
 
-# Example usage
-input_text = "shazam"
-binary_data = text_to_binary(input_text)
-print("Text input:", input_text)
-print("Binary data:", binary_data)
-dna_sequence = binary_to_dna(binary_data)
-print("DNA sequence:", dna_sequence)
+# original_text = dna_to_binary(dna_sequence)
+# print("Original text:", original_text)
 
-original_text = dna_to_binary(dna_sequence)
-print("Original text:", original_text)
+@app.route('/convert', methods=['POST'])
+def convert_text_to_dna():
+    input_data= request.form.get('input_data')
+    if input_data:
+        binary_data = text_to_binary(input_data)
+        dna_sequence = binary_to_dna(binary_data)
+        return jsonify({'dna_sequence': dna_sequence, 'binary_data': binary_data })
+    else:
+        return jsonify({'error': 'Input text is missing'}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)

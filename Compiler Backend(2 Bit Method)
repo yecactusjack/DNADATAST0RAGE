@@ -1,0 +1,62 @@
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from PIL import Image
+import base64
+import io
+import logging
+
+app = Flask(__name__)
+CORS(app)
+
+logging.basicConfig(level=logging.DEBUG)
+
+def text_to_binary(text):
+    return ''.join(format(ord(char), '08b') for char in text)
+
+def binary_to_dna(binary_data):
+    binary_to_dna_map = {'00': 'A', '01': 'G', '10': 'C', '11': 'T'}
+    dna_sequence = ''.join(binary_to_dna_map[binary_data[i:i+2]] for i in range(0, len(binary_data) - 1, 2))
+    if len(binary_data) % 2 != 0:
+        dna_sequence += 'U' if binary_data[-1] == '1' else 'UT'
+    return dna_sequence
+
+def image_to_binary(image_data):
+    try:
+        image = Image.open(io.BytesIO(image_data)).convert('1')  # Convert to black and white
+        width, height = image.size
+        binary_data = ''.join(['1' if image.getpixel((x, y)) > 128 else '0' 
+                               for y in range(height) for x in range(width)])
+        return binary_data
+    except Exception as e:
+        logging.error(f"Error processing image: {str(e)}")
+        return None
+
+@app.route('/convert', methods=['POST'])
+def convert_to_dna():
+    logging.info("Received request to /convert")
+    logging.debug(f"Request form: {request.form}")
+
+    input_data = request.form.get('input_data')
+    
+    if input_data:
+        # Check if input_data is base64 encoded image
+        if input_data.startswith('data:image'):
+            logging.info("Processing image input")
+            _, encoded = input_data.split(",", 1)
+            image_data = base64.b64decode(encoded)
+            binary_data = image_to_binary(image_data)
+        else:
+            logging.info("Processing text input")
+            binary_data = text_to_binary(input_data)
+        
+        if binary_data:
+            dna_sequence = binary_to_dna(binary_data)
+            return jsonify({'dna_sequence': dna_sequence, 'binary_data': binary_data[:1000] + '...' if len(binary_data) > 1000 else binary_data})
+        else:
+            return jsonify({'error': 'Conversion failed'}), 400
+    else:
+        logging.error("No input data found in request")
+        return jsonify({'error': 'Input data is missing'}), 400
+
+if __name__ == '__main__':
+    app.run(debug=True)
